@@ -72,7 +72,7 @@ def optimize_model_AC(actor, critic, q_optimizer, policy_optimizer, memory, loss
     
     reward_batch = torch.cat(batch.reward)
     action_batch = torch.cat(batch.action)
-    #action_batch.requires_grad_(True)
+    #print(action_batch.requires_grad)
     #reward_batch.requires_grad_(False)
     
     #Unfreeze weights of Critic
@@ -84,7 +84,6 @@ def optimize_model_AC(actor, critic, q_optimizer, policy_optimizer, memory, loss
     q_optimizer.zero_grad()
     q_loss = loss_fn(q, reward_batch) 
     #print(q_loss.requires_grad)
-    #q_loss.backward(retain_graph=True)
     q_optimizer.step()
     #action_batch.requires_grad_(False)
     
@@ -97,9 +96,7 @@ def optimize_model_AC(actor, critic, q_optimizer, policy_optimizer, memory, loss
     
     policy_loss = -critic(state_batch, actor(state_batch))
     #print(policy_loss.requires_grad)
-    #policy_loss = 0
-    #for state in state_batch:
-    #    policy_loss += -critic(state, select_action(actor, env, state_batch, steps_done, EPS_START, EPS_END, EPS_DECAY))
+    
     
     policy_loss = policy_loss.mean()
     policy_loss.backward()
