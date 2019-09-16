@@ -10,8 +10,7 @@ def flatten(t):
     return t
 
 class ModelQ_t:
-    def __init__(self, policy_net, target_net, env, steps_done, EPS_END, EPS_START, EPS_DECAY, 
-                memory, BATCH_SIZE, GAMMA, loss_fn, optimizer, TARGET_UPDATE):
+    def __init__(self, policy_net, target_net, env,  GAMMA, steps_done = 1, EPS_END = 0, EPS_START = 0, EPS_DECAY = 1, memory = None, BATCH_SIZE = None, loss_fn = None, optimizer = None, TARGET_UPDATE = None):
         self.policy_net = policy_net
         self.target_net = target_net
         self.env = env
@@ -28,8 +27,7 @@ class ModelQ_t:
         
     def select_action(self, state):
         sample = random.random()
-        eps_threshold = self.EPS_END + (self.EPS_START - self.EPS_END) * \
-            math.exp(-1. * self.steps_done / self.EPS_DECAY)
+        eps_threshold = self.EPS_END + (self.EPS_START - self.EPS_END) * math.exp(-1. * self.steps_done / self.EPS_DECAY)
         self.steps_done += 1
         if sample > eps_threshold:
             with torch.no_grad():
@@ -37,7 +35,7 @@ class ModelQ_t:
                 # second column on max result is index of where max element was
                 # found, so we pick action with the larger expected reward.
                 Q = self.policy_net(state)
-                _, action = torch.max(Q, -1)
+                action = torch.argmax(Q)
                 return torch.tensor(action)
         else:
             return torch.tensor(random.randrange(self.env.action_space.n))
